@@ -17,6 +17,8 @@ class WeatherViewModel : ViewModel() {
     }
 
     fun refreshWeather(lng: String, lat: String) {
+        locationLng = lng
+        locationLat = lat
         locationLiveData.value = Location(lng, lat)
     }
 }
