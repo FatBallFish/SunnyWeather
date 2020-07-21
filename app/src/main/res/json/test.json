@@ -1,0 +1,70 @@
+{
+  "status": "ok",
+  "api_version": "v2.5",
+  "api_status": "active",
+  "lang": "zh_CN",
+  "unit": "metric",
+  "tzshift": 28800,
+  "timezone": "Asia\/Shanghai",
+  "server_time": 1595296146,
+  "location": [
+    30.219416,
+    120.024765
+  ],
+  "result": {
+    "realtime": {
+      "status": "ok",
+      "temperature": 29.0,
+      "humidity": 0.79,
+      "cloudrate": 0.9,
+      "skycon": "CLOUDY",
+      "visibility": 5.4,
+      "dswrf": 417.7,
+      "wind": {
+        "speed": 1.8,
+        "direction": 91.0
+      },
+      "pressure": 100514.15,
+      "apparent_temperature": 33.4,
+      "precipitation": {
+        "local": {
+          "status": "ok",
+          "datasource": "radar",
+          "intensity": 0.0
+        },
+        "nearest": {
+          "status": "ok",
+          "distance": 79.83,
+          "intensity": 0.1875
+        }
+      },
+      "air_quality": {
+        "pm25": 19.0,
+        "pm10": 41.0,
+        "o3": 15.0,
+        "so2": 5.0,
+        "no2": 37.0,
+        "co": 0.8,
+        "aqi": {
+          "chn": 41.0,
+          "usa": 66.0
+        },
+        "description": {
+          "chn": "优",
+          "usa": "良"
+        }
+      },
+      "life_index": {
+        "ultraviolet": {
+          "index": 1.0,
+          "desc": "很弱"
+        },
+        "comfort": {
+          "index": 0,
+          "desc": "闷热"
+        }
+      }
+    },
+    "primary": 0
+  }
+}
