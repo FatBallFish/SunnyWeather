@@ -5,10 +5,12 @@ import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import com.sunnyweather.android.logic.Repository
 import com.sunnyweather.android.logic.model.Location
+import com.sunnyweather.android.logic.model.Place
 import com.sunnyweather.android.logic.network.SunnyWeatherNetwork
 
 class WeatherViewModel : ViewModel() {
     private val locationLiveData = MutableLiveData<Location>()
+    var place: Place? = null
     var locationLng = ""
     var locationLat = ""
     var placeName = ""
