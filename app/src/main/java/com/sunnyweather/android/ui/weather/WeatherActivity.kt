@@ -10,10 +10,15 @@ import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager2.widget.ViewPager2
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.sunnyweather.android.BaseActivity
 import com.sunnyweather.android.IndexViewPageAdapter
 import com.sunnyweather.android.R
+import com.sunnyweather.android.logic.dao.getConfig
 import com.sunnyweather.android.logic.dao.setConfig
+import com.sunnyweather.android.logic.model.Place
+import com.sunnyweather.android.ui.FavViewModel
 import com.sunnyweather.android.ui.place.PlaceFragment
 import com.sunnyweather.android.ui.place.PlaceViewModel
 import com.sunnyweather.android.ui.place.WeatherViewModel
@@ -26,8 +31,11 @@ import java.util.*
 class WeatherActivity : BaseActivity(), NavigateListener {
     val placeViewModel by lazy { ViewModelProvider(this)[PlaceViewModel::class.java] }
     val weatherViewModel by lazy { ViewModelProvider(this)[WeatherViewModel::class.java] }
-    private var currentIndex = 0;
+    val favViewModel by lazy { ViewModelProvider(this)[FavViewModel::class.java] }
+    private var currentIndex = 0
+    private var fav = false // 是否已收藏
     private val listenerMap = HashMap<Int, RefreshListener>(16)
+
 
     //    private var refreshListener: RefreshListener? = null;
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,10 +54,15 @@ class WeatherActivity : BaseActivity(), NavigateListener {
 
     private fun initConfig() {
         currentIndex = intent.getIntExtra("index", 0)
+        fav = favViewModel.contain(
+            favViewModel.getFavList(),
+            placeViewModel.getSavedPlace(currentIndex)
+        )
         Log.d(TAG, "currentIndex:$currentIndex")
     }
 
     private fun initUI() {
+        favBtn.setBackgroundResource(if (fav) R.drawable.ic_fav else R.drawable.ic_fav_bor)
         // 侧滑栏
         navBtn.setOnClickListener {
             drawerLayout.openDrawer(GravityCompat.START)
@@ -94,6 +107,20 @@ class WeatherActivity : BaseActivity(), NavigateListener {
                 }
             }
         })
+        favBtn.setOnClickListener {
+            val savedPlace = placeViewModel.getSavedPlace(currentIndex)
+            if (fav) {
+                favViewModel.deleteFav(place = savedPlace)
+                favBtn.setBackgroundResource(R.drawable.ic_fav_bor)
+                showToast("cancel fav")
+                fav = false
+            } else {
+                favViewModel.addFav(place = savedPlace)
+                favBtn.setBackgroundResource(R.drawable.ic_fav)
+                showToast("add fav")
+                fav = true
+            }
+        }
     }
 
     private fun initViewModel() {
@@ -102,6 +129,11 @@ class WeatherActivity : BaseActivity(), NavigateListener {
 
     fun refreshWeather(index: Int) {
         listenerMap[index]?.refresh()
+        fav = favViewModel.contain(
+            favViewModel.getFavList(),
+            placeViewModel.getSavedPlace(currentIndex)
+        )
+        favBtn.setBackgroundResource(if (fav) R.drawable.ic_fav else R.drawable.ic_fav_bor)
 //        refreshListener?.refresh()
     }
 

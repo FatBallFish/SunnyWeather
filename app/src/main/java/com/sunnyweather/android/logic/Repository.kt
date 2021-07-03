@@ -3,7 +3,6 @@ package com.sunnyweather.android.logic
 
 import androidx.lifecycle.liveData
 import com.sunnyweather.android.logic.dao.PlaceDao
-import com.sunnyweather.android.logic.model.DailyResponse
 import com.sunnyweather.android.logic.network.SunnyWeatherNetwork
 import kotlinx.coroutines.Dispatchers
 import java.lang.Exception
@@ -56,9 +55,16 @@ object Repository {
         }
     }
 
-    fun savePlace(place: Place,index:Int) = PlaceDao.savePlace(place,index)
-    fun getSavedPlace(index:Int) = PlaceDao.getSavedPlace(index)
-    fun isPlaceSaved(index:Int) = PlaceDao.isPlaceSaved(index)
+    fun savePlace(place: Place, index: Int) = PlaceDao.savePlace(place, index)
+    fun getSavedPlace(index: Int) = PlaceDao.getSavedPlace(index)
+    fun isPlaceSaved(index: Int) = PlaceDao.isPlaceSaved(index)
+
+    fun getFavList() = PlaceDao.getFavList()
+
+    fun addFav(place: Place) = PlaceDao.addFav(place)
+
+    fun deleteFav(place: Place) = PlaceDao.deleteFav(place)
+
     private fun <T> fire(context: CoroutineContext, block: suspend () -> Result<T>) =
         liveData<Result<T>>(context) {
             val result = try {

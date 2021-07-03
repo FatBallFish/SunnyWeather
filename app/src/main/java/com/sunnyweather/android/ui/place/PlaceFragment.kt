@@ -17,6 +17,9 @@ import com.sunnyweather.android.MainActivity
 import com.sunnyweather.android.R
 import com.sunnyweather.android.logic.dao.PlaceDao
 import com.sunnyweather.android.logic.dao.getConfig
+import com.sunnyweather.android.logic.dao.showToast
+import com.sunnyweather.android.logic.model.Place
+import com.sunnyweather.android.ui.FavViewModel
 import com.sunnyweather.android.ui.weather.IndexOutBoundFragment
 import com.sunnyweather.android.ui.weather.WeatherActivity
 import kotlinx.android.synthetic.main.fragment_place.*
@@ -25,8 +28,10 @@ private const val ARG_INDEX = "index"
 
 class PlaceFragment : Fragment() {
     val viewModel by lazy { ViewModelProvider(this)[PlaceViewModel::class.java] }
+    val fabViewModel by lazy { ViewModelProvider(this)[FavViewModel::class.java] }
     private lateinit var adapter: PlaceAdapter
     var index: Int = -1
+    val favList = ArrayList<Place>()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
@@ -59,19 +64,40 @@ class PlaceFragment : Fragment() {
             activity?.finish()
             return
         }
+        // 收藏夹加载
+        getFavList()
+        showToast("favList empty:${favList.isEmpty()}")
+        if (favList.isNotEmpty()) {
+            viewModel.placeList.clear()
+            viewModel.placeList.addAll(favList)
+            recyclerView.visibility = View.VISIBLE
+            bgImageView.visibility = View.GONE
+        } else {
+            recyclerView.visibility = View.GONE
+            bgImageView.visibility = View.VISIBLE
+        }
+
+        // 事件监听
         val layoutManager = LinearLayoutManager(activity)
         recyclerView.layoutManager = layoutManager
         adapter = PlaceAdapter(this, viewModel.placeList)
         recyclerView.adapter = adapter
         searchPlaceEdit.addTextChangedListener { text: Editable? ->
             val content = text.toString()
-            if (content.isNotEmpty()) {
+            if (content.isNotBlank()) {
                 viewModel.searchPlaces(content)
             } else {
-                recyclerView.visibility = View.GONE
-                bgImageView.visibility = View.VISIBLE
-                viewModel.placeList.clear()
-                adapter.notifyDataSetChanged()
+                getFavList()
+                if (favList.isEmpty()) {
+                    recyclerView.visibility = View.GONE
+                    bgImageView.visibility = View.VISIBLE
+                    viewModel.placeList.clear()
+                    adapter.notifyDataSetChanged()
+                } else {
+                    viewModel.placeList.clear()
+                    viewModel.placeList.addAll(favList)
+                    adapter.notifyDataSetChanged()
+                }
             }
         }
         viewModel.placeLiveData.observe(viewLifecycleOwner, Observer { result ->
@@ -87,6 +113,28 @@ class PlaceFragment : Fragment() {
                 result.exceptionOrNull()?.printStackTrace()
             }
         })
+    }
+    fun getFavList(){
+        favList.clear()
+        favList.addAll(fabViewModel.getFavList())
+    }
+    override fun onResume() {
+        super.onResume()
+        showToast("on Resume")
+        getFavList()
+        if (searchPlaceEdit.text.toString().isBlank()) {
+            if (favList.isEmpty()) {
+                recyclerView.visibility = View.GONE
+                bgImageView.visibility = View.VISIBLE
+                viewModel.placeList.clear()
+                adapter.notifyDataSetChanged()
+            } else {
+                viewModel.placeList.clear()
+                viewModel.placeList.addAll(favList)
+                adapter.notifyDataSetChanged()
+            }
+        }
+
     }
 
     companion object {
